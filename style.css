@@ -2161,3 +2161,86 @@ body {
   margin: 0;
 }
 
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 0 var(--space-12);
+  }
+
+  .header-logo {
+    display: none;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: var(--space-16);
+    padding: 0 var(--space-12);
+  }
+
+  .header-controls {
+    justify-content: center;
+  }
+
+  .pentagon-container {
+    flex-direction: column;
+    gap: var(--space-24);
+  }
+
+  .pentagon-svg {
+    width: 240px;
+    height: 240px;
+  }
+
+  .nav-container {
+    padding: var(--space-8);
+    gap: var(--space-4);
+  }
+
+  .nav-item {
+    min-width: 50px;
+    padding: var(--space-8) var(--space-6);
+  }
+
+  .nav-icon {
+    font-size: var(--font-size-lg);
+  }
+
+  .nav-text {
+    font-size: 10px;
+  }
+
+  .app-title {
+    font-size: var(--font-size-3xl);
+  }
+
+  .topic-progress-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .badges-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-text {
+    display: none;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-content {
+    padding: 0 var(--space-8);
+  }
+
+  .pentagon-svg {
+    width: 200px;
+    height: 200px;
+  }
+}
