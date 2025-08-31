@@ -320,7 +320,7 @@ console.log("Total questions answered:", getTotalAnswered());
 
 const resetBtn = document.getElementById("re");
 
-resetBtn.addEventListener("click", () => {
+re.addEventListener("click", () => {
     localStorage.removeItem("answeredCount"); 
     localStorage.removeItem("answeredDate");  
     localStorage.removeItem("lastAnswered");  
