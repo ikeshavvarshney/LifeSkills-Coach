@@ -257,45 +257,75 @@ const questions = [
   ];
   
 
-  function shuffleArray(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  }
+  const quesEl = document.getElementById("ques");
+const op1 = document.getElementById("op1");
+const op2 = document.getElementById("op2");
+const op3 = document.getElementById("op3");
+const message = document.getElementById("message");
 
-  let shuffledQuestions = shuffleArray([...questions]);
-  let currentIndex = 0;
+const today = new Date().toDateString();
 
-  function loadQuestion() {
-    if (currentIndex >= shuffledQuestions.length) {
-      document.getElementById("ques").innerText = "🎉 Quiz Completed!";
-      document.getElementById("op1").style.display = "none";
-      document.getElementById("op2").style.display = "none";
-      document.getElementById("op3").style.display = "none";
-      return;
-    }
+let lastAnswered = localStorage.getItem("lastAnswered");
+let totalAnswered = localStorage.getItem("answeredCount") 
+    ? parseInt(localStorage.getItem("answeredCount")) 
+    : 0;
 
-    let q = shuffledQuestions[currentIndex];
-    document.getElementById("ques").innerText = q.question;
+function disableOptions() {
+    [op1, op2, op3].forEach(btn => btn.disabled = true);
+}
 
-    let shuffledOptions = shuffleArray([...q.options]);
-    document.getElementById("op1").innerText = shuffledOptions[0];
-    document.getElementById("op2").innerText = shuffledOptions[1];
-    document.getElementById("op3").innerText = shuffledOptions[2];
+if (lastAnswered === today) {
+    message.textContent = "Congratulations you have answered a question! Visit again tomorrow.";
+    disableOptions();
+} else {
+    const randomQ = questions[Math.floor(Math.random() * questions.length)];
+    quesEl.textContent = randomQ.question;
 
-    document.querySelectorAll(".options").forEach(btn => {
-      btn.onclick = function() {
-        if (btn.innerText === q.answer) {
-          alert("✅ Correct!");
-        } else {
-          alert("❌ Wrong! Correct answer: " + q.answer);
-        }
-        currentIndex++;
-        loadQuestion(); 
-      }
+    [op1, op2, op3].forEach((btn, i) => {
+        btn.textContent = randomQ.options[i];
+        btn.onclick = () => {
+            if (localStorage.getItem("lastAnswered") === today) {
+                message.textContent = "You already answered today's question!";
+                return;
+            }
+
+            if (btn.textContent === randomQ.answer) {
+                message.textContent = "Correct! 🎉";
+            } else {
+                message.textContent = "Oops! The correct answer is: " + randomQ.answer;
+            }
+
+            localStorage.setItem("lastAnswered", today);
+
+            totalAnswered++;
+            localStorage.setItem("answeredCount", totalAnswered);
+
+            disableOptions();
+
+            setTimeout(() => {
+                message.textContent = "Congratulations you have answered a question! Visit again tomorrow.";
+            }, 1500);
+        };
     });
 }
 
-loadQuestion();
+function getTotalAnswered() {
+    return totalAnswered;
+}
+
+var streakno = document.getElementById("streakhead");
+streakno.innerHTML=`${getTotalAnswered()} day streak`
+
+console.log("Total questions answered:", getTotalAnswered());
+
+const resetBtn = document.getElementById("re");
+
+resetBtn.addEventListener("click", () => {
+    localStorage.removeItem("answeredCount"); 
+    localStorage.removeItem("answeredDate");  
+    localStorage.removeItem("lastAnswered");  
+
+    totalAnswered = 0;
+    message.textContent = "Progress has been reset. You can answer again!";
+    [op1, op2, op3].forEach(btn => btn.disabled = false); 
+});
