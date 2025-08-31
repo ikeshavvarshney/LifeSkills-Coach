@@ -860,6 +860,188 @@ class LifeSkillsCoach {
     }
 }
 
+// Pentagon Tracker Class - IMPROVED RESPONSIVE Canvas Implementation
+class PentagonTracker {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        if (!this.canvas) {
+            console.error('Canvas element not found:', canvasId);
+            return;
+        }
+        
+        this.ctx = this.canvas.getContext('2d');
+        this.maxStat = 30; // Max XP per topic
+        
+        // Topic mapping with emojis
+        this.topicOrder = ["road-rules", "personal-hygiene", "waste-management", "digital-scams", "food-safety"];
+        this.labels = ["🚦", "🧼", "♻️", "🔒", "🍎"];
+        this.stats = [5, 5, 5, 5, 5]; // Current XP values for each topic
+        
+        // Apply CSS styling to canvas
+        this.applyStyling();
+        
+        // Make canvas responsive - IMPROVED
+        this.makeResponsive();
+        
+        this.drawRadar();
+    }
+    
+    applyStyling() {
+        this.canvas.style.background = 'var(--bg-tertiary)';
+        this.canvas.style.borderRadius = 'var(--radius-md)';
+        this.canvas.style.border = '2px solid var(--accent-primary)';
+        this.canvas.style.display = 'block';
+    }
+    
+    // IMPROVED RESPONSIVE FUNCTIONALITY
+    makeResponsive() {
+        this.resizeCanvas();
+        
+        // Handle window resize with debouncing
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                this.resizeCanvas();
+                this.drawRadar();
+            }, 250);
+        });
+    }
+    
+    resizeCanvas() {
+        const container = this.canvas.parentElement;
+        const containerWidth = container ? container.clientWidth : 400;
+        
+        // Better responsive sizing - FIXED for mobile
+        let size;
+        if (window.innerWidth <= 480) {
+            size = Math.min(containerWidth - 40, 250); // Smaller on mobile
+        } else if (window.innerWidth <= 768) {
+            size = Math.min(containerWidth - 50, 300); // Medium on tablets
+        } else {
+            size = Math.min(containerWidth - 60, 400); // Full size on desktop
+        }
+        
+        // Set actual canvas size
+        this.canvas.width = size;
+        this.canvas.height = size;
+        
+        // Update center and radius
+        this.centerX = this.canvas.width / 2;
+        this.centerY = this.canvas.height / 2;
+        this.maxRadius = Math.min(this.canvas.width, this.canvas.height) * 0.3; // Smaller radius for emoji space
+        
+        // FIXED: Better emoji positioning for mobile
+        this.labelRadius = this.maxRadius + Math.max(25, size * 0.08);
+    }
+    
+    // Non-linear progression: fast at start, slower at end
+    getVisualValue(xp) {
+        if (xp <= 0) return 0;
+        if (xp >= this.maxStat) return this.maxStat;
+        
+        // Use a logarithmic-like curve for non-linear progression
+        const normalized = xp / this.maxStat;
+        const curved = Math.pow(normalized, 0.6); // Adjust curve steepness
+        return curved * this.maxStat;
+    }
+    
+    // Convert polar coordinates (angle+radius) → (x,y)
+    getPoint(angle, value) {
+        const visualValue = this.getVisualValue(value);
+        let r = (visualValue / this.maxStat) * this.maxRadius;
+        let x = this.centerX + r * Math.cos(angle);
+        let y = this.centerY + r * Math.sin(angle);
+        return [x, y];
+    }
+    
+    // Update stats from localStorage data
+    updateStats(topicXP) {
+        this.stats = this.topicOrder.map(topic => {
+            return Math.min(topicXP[topic] || 0, this.maxStat);
+        });
+        this.drawRadar();
+    }
+    
+    drawRadar() {
+        if (!this.ctx) return;
+        
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // IMPROVED: Get navbar background color for dots
+        const rootStyles = getComputedStyle(document.documentElement);
+        const navBgColor = rootStyles.getPropertyValue('--bg-nav').trim();
+        
+        // Extract color from rgba/rgb - simplified approach
+        let dotColor = '#1e293b'; // fallback dark color
+        if (navBgColor.includes('rgba') || navBgColor.includes('rgb')) {
+            // For simplicity, use a consistent dark color that works in both themes
+            dotColor = document.documentElement.getAttribute('data-color-scheme') === 'dark' ? '#374151' : '#1e293b';
+        }
+        
+        // Draw concentric pentagon grid (using visual values for grid)
+        this.ctx.strokeStyle = document.documentElement.getAttribute('data-color-scheme') === 'dark' ? '#444' : '#ccc';
+        this.ctx.lineWidth = 1;
+        for (let level = 5; level <= this.maxStat; level += 5) {
+            this.ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                let angle = (Math.PI * 2 / 5) * i - Math.PI / 2;
+                let [x, y] = this.getPoint(angle, level);
+                if (i === 0) this.ctx.moveTo(x, y);
+                else this.ctx.lineTo(x, y);
+            }
+            this.ctx.closePath();
+            this.ctx.stroke();
+        }
+        
+        // Draw stat area (filled pentagon)
+        this.ctx.beginPath();
+        this.ctx.fillStyle = "rgba(0,255,204,0.3)";
+        this.ctx.strokeStyle = "#00ffcc";
+        this.ctx.lineWidth = 2;
+        for (let i = 0; i < 5; i++) {
+            let angle = (Math.PI * 2 / 5) * i - Math.PI / 2;
+            let [x, y] = this.getPoint(angle, this.stats[i]);
+            if (i === 0) this.ctx.moveTo(x, y);
+            else this.ctx.lineTo(x, y);
+        }
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Draw emoji labels - IMPROVED POSITIONING for mobile
+        this.ctx.fillStyle = document.documentElement.getAttribute('data-color-scheme') === 'dark' ? '#f1f5f9' : '#1e293b';
+        this.ctx.font = `${Math.max(14, this.canvas.width / 20)}px Arial`; // Better responsive font size
+        this.ctx.textAlign = "center";
+        this.ctx.textBaseline = "middle";
+        for (let i = 0; i < 5; i++) {
+            let angle = (Math.PI * 2 / 5) * i - Math.PI / 2;
+            let x = this.centerX + this.labelRadius * Math.cos(angle);
+            let y = this.centerY + this.labelRadius * Math.sin(angle);
+            this.ctx.fillText(this.labels[i], x, y);
+        }
+        
+        // FIXED: Draw smaller, darker points at each vertex
+        this.ctx.fillStyle = dotColor;
+        for (let i = 0; i < 5; i++) {
+            let angle = (Math.PI * 2 / 5) * i - Math.PI / 2;
+            let [x, y] = this.getPoint(angle, this.stats[i]);
+            
+            // FIXED: Smaller circle points (radius 3 instead of 4)
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, 3, 0, 2 * Math.PI);
+            this.ctx.fill();
+            
+            // Subtle glow effect with darker color
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, 5, 0, 2 * Math.PI);
+            this.ctx.fillStyle = dotColor + '40'; // Add transparency
+            this.ctx.fill();
+            this.ctx.fillStyle = dotColor; // Reset for next iteration
+        }
+    }
+}
+
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new LifeSkillsCoach();

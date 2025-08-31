@@ -1317,6 +1317,32 @@ body {
   flex-wrap: wrap;
 }
 
+.canvas-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: var(--space-16);
+}
+
+#radar {
+    width: 100%;
+    height: auto;
+    max-width: 400px;
+    background: var(--bg-tertiary);
+    padding: var(--space-20);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--accent-primary);
+    display: block;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    #radar {
+        max-width: 300px;
+        padding: var(--space-16);
+    }
+}
+
 .pentagon-stats {
   display: grid;
   grid-template-columns: 1fr;
