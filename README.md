@@ -56,7 +56,7 @@ LifeSkills-Coach/
 ├── app.js
 ├── logo.svg
 ├── favicon.ico
-├── LICENSE # MIT License file
+├── LICENSE
 └── README.md # Project documentation
 ```
 
