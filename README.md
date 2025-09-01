@@ -1,8 +1,6 @@
 # LifeSkills Coach
 
-[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)  
-![GitHub Stars](https://img.shields.io/github/stars/ikeshavvarshney/LifeSkills-Coach?style=flat-square&color=yellow)  
-![GitHub Forks](https://img.shields.io/github/forks/ikeshavvarshney/LifeSkills-Coach?style=flat-square&color=orange)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)   ![GitHub Stars](https://img.shields.io/github/stars/ikeshavvarshney/LifeSkills-Coach?style=flat-square&color=yellow)   ![GitHub Forks](https://img.shields.io/github/forks/ikeshavvarshney/LifeSkills-Coach?style=flat-square&color=orange)
 
 **LifeSkills Coach** is an interactive web app that gamifies essential life skills with an RPG-style tracker.  
 It helps learners build awareness and confidence in areas like **Road Rules, Hygiene, Waste Management, Digital Scams, and Food Safety**—all through a fun, challenge-based system. With badges, streaks, and an XP tracker, the project transforms everyday learning into a practical yet engaging experience.  
